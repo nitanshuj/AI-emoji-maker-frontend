@@ -1,4 +1,4 @@
-import { MoodType, StyleType } from "@/types/emoji"
+import { MoodType, PlanType, StyleType } from "@/types/emoji"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
 
@@ -26,6 +26,15 @@ export interface GenerateAPIResponse {
 
 export interface HistoryAPIResponse {
   generations: GenerateAPIResponse[]
+}
+
+export interface UserProfileAPIResponse {
+  id: string
+  email: string
+  full_name: string | null
+  plan_type: PlanType
+  generations_used: number
+  max_generations: number
 }
 
 export const API = {
@@ -97,6 +106,26 @@ export const API = {
   },
 
   /**
+   * Get the full user profile for the authenticated user
+   */
+  async getProfile(token: string): Promise<UserProfileAPIResponse> {
+    const res = await fetch(`${BASE_URL}/users/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Failed to fetch user profile");
+    }
+
+    return res.json();
+  },
+
+  /**
    * Get generation history for the authenticated user
    */
   async getHistory(token: string): Promise<GenerateAPIResponse[]> {
@@ -108,7 +137,8 @@ export const API = {
     })
 
     if (!res.ok) {
-      throw new Error("Failed to load generation history")
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Failed to load generation history");
     }
 
     const data: HistoryAPIResponse = await res.json()

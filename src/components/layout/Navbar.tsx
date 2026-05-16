@@ -55,8 +55,15 @@ export function Navbar() {
 
           {/* Current Plan Badge */}
           <div onClick={() => setShowUpgradeModal(true)} className="cursor-pointer">
-            <Badge variant={user.plan === "Premium" ? "premium" : "secondary"} className="px-3 py-1 text-xs">
-              {user.plan === "Premium" ? (
+            <Badge
+              variant={user.plan === "Ultra" ? "premium" : user.plan === "Premium" ? "premium" : "secondary"}
+              className={`px-3 py-1 text-xs ${user.plan === "Ultra" ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0" : ""}`}
+            >
+              {user.plan === "Ultra" ? (
+                <span className="flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" /> Ultra
+                </span>
+              ) : user.plan === "Premium" ? (
                 <span className="flex items-center gap-1">
                   <Sparkles className="h-3 w-3" /> Premium
                 </span>
